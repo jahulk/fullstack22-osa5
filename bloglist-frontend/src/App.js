@@ -64,7 +64,7 @@ const App = () => {
 
       const newBlog = await blogService.create(blogObject)
       setBlogs(blogs.concat(newBlog))
-      displayNotification('success', `a new blog ${newBlog.title} by ${newBlog.author} added`)
+      displayNotification('message', `a new blog ${newBlog.title} by ${newBlog.author} added`)
       blogFormRef.current.toggleVisibility()
     } catch (error) {
       displayNotification('error', error.response.data.error)
@@ -72,14 +72,31 @@ const App = () => {
     }
   }
 
+  const deleteBlog = async (blog) => {
+    try {
+      if (window.confirm(`remove ${blog.title} by ${blog.author}`)) {
+        await blogService.remove(blog.id)
+        setBlogs(blogs.filter(b => b.id !== blog.id))
+        displayNotification('message', 'blog removed')
+      }
+    } catch (error) {
+      displayNotification('error', error.response.data.error)
+      console.log(error)
+    }
+  }
+
   const likeBlog = async (blog) => {
+
     try {
       const blogObject = {
-        ...blog,
-        likes: blog.likes+1
+        author: blog.author,
+        title: blog.title,
+        url: blog.url,
+        likes: blog.likes+1,
+        user: blog.user ? blog.user.id : null
       }
 
-      const updatedBlog = await blogService.update(blogObject.id, blogObject)
+      const updatedBlog = await blogService.update(blog.id, blogObject)
       const updatedBlogs = [...blogs].map(b => b.id === updatedBlog.id ? updatedBlog : b)
       setBlogs(updatedBlogs)
     } catch (error) {
@@ -132,8 +149,8 @@ const App = () => {
       <Togglable buttonLabel="new blog" ref={blogFormRef}>
         <BlogForm addBlog={addBlog} />
       </Togglable>
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} likeBlog={likeBlog} />
+      {blogs.sort((a, b) => b.likes - a.likes).map(blog =>
+        <Blog key={blog.id} blog={blog} likeBlog={likeBlog} deleteBlog={deleteBlog} currentUser={user} />
       )}
     </div>
   )
