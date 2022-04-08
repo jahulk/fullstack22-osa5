@@ -29,10 +29,10 @@ const App = () => {
   }, [])
 
   const displayNotification = (type, content) => {
-      setNotification({type, content})
-      setTimeout(() => {
-        setNotification(null);
-      }, 3000)
+    setNotification({ type, content })
+    setTimeout(() => {
+      setNotification(null)
+    }, 3000)
   }
 
   const handleLogin = async (event) => {
@@ -128,7 +128,7 @@ const App = () => {
           </div>
           <div>
             password
-            <input 
+            <input
               type="password"
               value={password}
               name="password"
